@@ -1,1 +1,27 @@
+// creating table
+CREATE TABLE teachers(
+name varchar(20),
+    age int,
+    salary double,
+    subject varchar(20)
+);
+
+//inserting value to database
+INSERT INTO teachers(name,age,salary,subject)
+VALUES("Mahbubur Rahaman",34,50000,"CSIT");
+INSERT INTO teachers(name,age,salary,subject)
+VALUES("Samsujjaman Sabuj",35,50000,"CCE");
+INSERT INTO teachers(name,age,salary,subject)
+VALUES("Masudur Rahaman",37,50000,"Math");
+
+//updating value
+UPDATE teachers SET salary=60000 WHERE age=37;
+UPDATE teachers set salary=salary+5000 WHERE salary>10000;
+
+//deleting data
+DELETE FROM students WHERE roll=2;
+
+//set to uppercase
+SELECT upper(name) FROM students;
+
 
