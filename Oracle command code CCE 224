@@ -9,3 +9,22 @@ grant create session to dora;
 connect dora/psyche;
 //change password of dora
 password dora;
+
+
+// project password management
+
+//creating a profile for users
+CREATE PROFILE c##Password_Management 
+LIMIT 
+    PASSWORD_LIFE_TIME 10 
+    PASSWORD_GRACE_TIME 8 
+    PASSWORD_REUSE_MAX 3 
+    PASSWORD_LOCK_TIME 1 
+    FAILED_LOGIN_ATTEMPTS 2 
+    PASSWORD_REUSE_TIME 10;
+//creating user using this profile
+create user tester identified by avacado profile Password_Management;
+//if user locked
+//i have to goto sysdba and than write
+sqlplus/sysdba
+alter user tester account unlock;
