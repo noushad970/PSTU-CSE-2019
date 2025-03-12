@@ -1,1 +1,11 @@
 //all the codes for oracle database password management system 
+//creating user dora with password avocado
+create user Dora identified by avocado;
+//changing password for dora
+alter user dora identified by psyche;
+//granting session to dora
+grant create session to dora;
+//connecting user dora with password
+connect dora/psyche;
+//change password of dora
+password dora;
