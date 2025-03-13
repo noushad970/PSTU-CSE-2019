@@ -29,3 +29,19 @@ create user tester identified by avacado profile Password_Management;
 //i have to goto sysdba and than write
 sqlplus/sysdba
 alter user tester account unlock;
+
+Mohammad Noushad🍅, [3/13/2025 3:05 AM]
+INSERT INTO Person1.NEWSPAPER VALUES (3, 'Daily News', 2.75);
+COMMIT;
+
+Mohammad Noushad🍅, [3/13/2025 3:05 AM]
+INSERT INTO NEWSPAPER (id, name, publication_date) VALUES (1, 'The Daily News', TO_DATE('2023-10-01', 'YYYY-MM-DD'));
+
+Mohammad Noushad🍅, [3/13/2025 6:02 AM]
+CREATE OR REPLACE TRIGGER trg_before_update_rating
+    BEFORE UPDATE OF rating ON BOOKSHELF
+    FOR EACH ROW
+   BEGIN
+       INSERT INTO BOOKSHELF_AUDIT (book_id, old_rating, new_rating, update_date)
+     VALUES (:OLD.book_id, :OLD.rating, :NEW.rating, SYSDATE);
+  END;
