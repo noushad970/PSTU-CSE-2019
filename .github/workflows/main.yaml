@@ -1,0 +1,26 @@
+name: Auto Commit
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Every hour (UTC)
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Make changes (example: update timestamp)
+      run: |
+        echo "Last updated: $(date -u)" > last-updated.txt
+
+    - name: Commit changes
+      run: |
+        git config user.name "noushad_The_Bot"
+        git config user.email "bmdnoushad@gmail.com"
+        git add .
+        git commit -m "Auto update $(date -u)" || echo "No changes to commit"
+        git push
