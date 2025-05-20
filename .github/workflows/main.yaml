@@ -16,9 +16,6 @@ jobs:
     - name: Run script
       run: |
         echo "Last updated: $(date -u)" > last-updated.txt
-
-    - name: Commit changes
-      run: |
         git config user.name "noushad_The_Bot"
         git config user.email "bmdnoushad@gmail.com"
         git add .
