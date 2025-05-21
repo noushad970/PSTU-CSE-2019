@@ -84,6 +84,14 @@
     <comp lib="1" loc="(840,590)" name="AND Gate"/>
     <comp lib="1" loc="(840,690)" name="AND Gate"/>
     <comp lib="1" loc="(850,900)" name="AND Gate"/>
+    <comp lib="5" loc="(1020,690)" name="LED"/>
+    <comp lib="5" loc="(1020,800)" name="LED"/>
+    <comp lib="5" loc="(1020,900)" name="LED"/>
+    <comp lib="5" loc="(1030,130)" name="RGBLED"/>
+    <comp lib="5" loc="(1030,470)" name="LED"/>
+    <comp lib="5" loc="(1030,590)" name="LED"/>
+    <comp lib="5" loc="(990,260)" name="LED"/>
+    <comp lib="5" loc="(990,360)" name="LED"/>
     <comp lib="8" loc="(163,584)" name="Text">
       <a name="text" val="Z"/>
     </comp>
@@ -126,6 +134,7 @@
     <comp lib="8" loc="(915,875)" name="Text">
       <a name="text" val="XY'Z"/>
     </comp>
+    <wire from="(1030,130)" to="(1030,140)"/>
     <wire from="(110,160)" to="(110,240)"/>
     <wire from="(110,160)" to="(310,160)"/>
     <wire from="(110,240)" to="(140,240)"/>
@@ -248,13 +257,15 @@
     <wire from="(780,780)" to="(780,790)"/>
     <wire from="(780,880)" to="(780,910)"/>
     <wire from="(780,880)" to="(800,880)"/>
-    <wire from="(830,140)" to="(980,140)"/>
-    <wire from="(830,260)" to="(980,260)"/>
-    <wire from="(830,800)" to="(990,800)"/>
-    <wire from="(840,360)" to="(980,360)"/>
+    <wire from="(830,140)" to="(1030,140)"/>
+    <wire from="(830,260)" to="(990,260)"/>
+    <wire from="(830,800)" to="(1020,800)"/>
+    <wire from="(840,360)" to="(990,360)"/>
     <wire from="(840,480)" to="(990,480)"/>
-    <wire from="(840,590)" to="(990,590)"/>
-    <wire from="(840,690)" to="(1000,690)"/>
-    <wire from="(850,900)" to="(1010,900)"/>
+    <wire from="(840,590)" to="(1030,590)"/>
+    <wire from="(840,690)" to="(1020,690)"/>
+    <wire from="(850,900)" to="(1020,900)"/>
+    <wire from="(990,470)" to="(1030,470)"/>
+    <wire from="(990,470)" to="(990,480)"/>
   </circuit>
 </project>
