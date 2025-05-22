@@ -56,34 +56,71 @@
     <a name="circuit" val="main"/>
     <a name="circuitnamedboxfixedsize" val="true"/>
     <a name="simulationFrequency" val="1.0"/>
-    <comp lib="0" loc="(270,180)" name="Pin">
+    <comp lib="0" loc="(110,100)" name="Pin">
       <a name="appearance" val="NewPins"/>
     </comp>
-    <comp lib="0" loc="(270,240)" name="Pin">
+    <comp lib="0" loc="(190,260)" name="Clock"/>
+    <comp lib="0" loc="(240,440)" name="Pin">
       <a name="appearance" val="NewPins"/>
     </comp>
-    <comp lib="0" loc="(270,280)" name="Pin">
+    <comp lib="0" loc="(240,490)" name="Pin">
       <a name="appearance" val="NewPins"/>
     </comp>
-    <comp lib="0" loc="(270,330)" name="Pin">
+    <comp lib="0" loc="(630,380)" name="Pin">
       <a name="appearance" val="NewPins"/>
     </comp>
-    <comp lib="1" loc="(700,220)" name="OR Gate"/>
-    <comp lib="1" loc="(700,360)" name="OR Gate"/>
-    <comp lib="5" loc="(860,210)" name="LED"/>
-    <comp lib="5" loc="(870,360)" name="LED"/>
-    <wire from="(270,180)" to="(350,180)"/>
-    <wire from="(270,240)" to="(650,240)"/>
-    <wire from="(270,280)" to="(380,280)"/>
-    <wire from="(350,180)" to="(350,340)"/>
-    <wire from="(350,180)" to="(650,180)"/>
-    <wire from="(350,340)" to="(650,340)"/>
-    <wire from="(380,280)" to="(380,380)"/>
-    <wire from="(380,380)" to="(650,380)"/>
-    <wire from="(650,180)" to="(650,200)"/>
-    <wire from="(700,220)" to="(860,220)"/>
-    <wire from="(700,360)" to="(870,360)"/>
-    <wire from="(860,210)" to="(860,220)"/>
-    <wire from="(870,360)" to="(880,360)"/>
+    <comp lib="0" loc="(650,520)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(670,80)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="1" loc="(110,260)" name="NOT Gate"/>
+    <comp lib="1" loc="(370,190)" name="NAND Gate"/>
+    <comp lib="1" loc="(370,320)" name="NAND Gate"/>
+    <comp lib="1" loc="(630,190)" name="NAND Gate"/>
+    <comp lib="1" loc="(630,320)" name="NAND Gate"/>
+    <comp lib="4" loc="(390,430)" name="D Flip-Flop">
+      <a name="appearance" val="logisim_evolution"/>
+    </comp>
+    <comp lib="5" loc="(840,190)" name="LED"/>
+    <comp lib="5" loc="(850,320)" name="LED"/>
+    <wire from="(110,100)" to="(110,170)"/>
+    <wire from="(110,170)" to="(310,170)"/>
+    <wire from="(110,260)" to="(110,340)"/>
+    <wire from="(110,340)" to="(310,340)"/>
+    <wire from="(190,260)" to="(270,260)"/>
+    <wire from="(240,440)" to="(380,440)"/>
+    <wire from="(240,480)" to="(240,490)"/>
+    <wire from="(240,480)" to="(380,480)"/>
+    <wire from="(270,210)" to="(270,260)"/>
+    <wire from="(270,210)" to="(310,210)"/>
+    <wire from="(270,260)" to="(270,300)"/>
+    <wire from="(270,300)" to="(310,300)"/>
+    <wire from="(370,170)" to="(370,190)"/>
+    <wire from="(370,170)" to="(570,170)"/>
+    <wire from="(370,320)" to="(370,340)"/>
+    <wire from="(370,340)" to="(520,340)"/>
+    <wire from="(440,440)" to="(630,440)"/>
+    <wire from="(440,480)" to="(650,480)"/>
+    <wire from="(520,210)" to="(520,260)"/>
+    <wire from="(520,210)" to="(570,210)"/>
+    <wire from="(520,260)" to="(690,260)"/>
+    <wire from="(520,280)" to="(520,340)"/>
+    <wire from="(520,280)" to="(650,280)"/>
+    <wire from="(520,340)" to="(570,340)"/>
+    <wire from="(630,190)" to="(650,190)"/>
+    <wire from="(630,320)" to="(690,320)"/>
+    <wire from="(630,380)" to="(630,440)"/>
+    <wire from="(630,440)" to="(640,440)"/>
+    <wire from="(650,190)" to="(650,280)"/>
+    <wire from="(650,190)" to="(670,190)"/>
+    <wire from="(650,480)" to="(650,520)"/>
+    <wire from="(670,190)" to="(840,190)"/>
+    <wire from="(670,80)" to="(670,190)"/>
+    <wire from="(690,260)" to="(690,320)"/>
+    <wire from="(690,320)" to="(850,320)"/>
+    <wire from="(80,170)" to="(110,170)"/>
+    <wire from="(80,170)" to="(80,260)"/>
   </circuit>
 </project>

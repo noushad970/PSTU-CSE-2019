@@ -56,5 +56,52 @@
     <a name="circuit" val="main"/>
     <a name="circuitnamedboxfixedsize" val="true"/>
     <a name="simulationFrequency" val="1.0"/>
+    <comp lib="0" loc="(210,380)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(80,360)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(90,170)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="0" loc="(90,240)" name="Pin">
+      <a name="appearance" val="NewPins"/>
+    </comp>
+    <comp lib="1" loc="(250,220)" name="AND Gate"/>
+    <comp lib="1" loc="(260,320)" name="AND Gate"/>
+    <comp lib="1" loc="(460,230)" name="OR Gate"/>
+    <comp lib="1" loc="(580,320)" name="OR Gate"/>
+    <comp lib="5" loc="(720,300)" name="LED"/>
+    <wire from="(120,170)" to="(120,310)"/>
+    <wire from="(120,170)" to="(190,170)"/>
+    <wire from="(120,310)" to="(180,310)"/>
+    <wire from="(180,300)" to="(180,310)"/>
+    <wire from="(180,300)" to="(210,300)"/>
+    <wire from="(180,340)" to="(180,360)"/>
+    <wire from="(180,340)" to="(210,340)"/>
+    <wire from="(190,170)" to="(190,200)"/>
+    <wire from="(190,200)" to="(200,200)"/>
+    <wire from="(210,380)" to="(480,380)"/>
+    <wire from="(250,220)" to="(260,220)"/>
+    <wire from="(260,210)" to="(260,220)"/>
+    <wire from="(260,210)" to="(410,210)"/>
+    <wire from="(260,320)" to="(270,320)"/>
+    <wire from="(270,310)" to="(270,320)"/>
+    <wire from="(270,310)" to="(390,310)"/>
+    <wire from="(390,250)" to="(390,310)"/>
+    <wire from="(390,250)" to="(410,250)"/>
+    <wire from="(460,230)" to="(480,230)"/>
+    <wire from="(480,230)" to="(480,300)"/>
+    <wire from="(480,300)" to="(530,300)"/>
+    <wire from="(480,340)" to="(480,380)"/>
+    <wire from="(480,340)" to="(530,340)"/>
+    <wire from="(580,320)" to="(590,320)"/>
+    <wire from="(590,300)" to="(590,320)"/>
+    <wire from="(590,300)" to="(720,300)"/>
+    <wire from="(80,310)" to="(120,310)"/>
+    <wire from="(80,360)" to="(180,360)"/>
+    <wire from="(90,170)" to="(120,170)"/>
+    <wire from="(90,240)" to="(200,240)"/>
   </circuit>
 </project>
