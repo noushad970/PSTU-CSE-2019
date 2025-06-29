@@ -1,0 +1,50 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+.head {
+    background-color: #008e48;
+    color: white;
+    text-align: center;
+    padding: 1em;
+}
+.container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #fff;
+    margin-left: 20px;
+    border-radius: 5px;
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: #f0f0f0;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: black;
+}
+
+.sidebar button.active {
+    color: #28a745; /* Green text */
+}
+
+.sidebar button:hover {
+    background-color: #ddd;
+}
+
+.content h2 {
+    margin-top: 0;
+}
