@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Acer/OneDrive/Desktop/Academic/Numeric Method",
-      "program": "c:/Users/Acer/OneDrive/Desktop/Academic/Numeric Method/build/Debug/outDebug",
+      "cwd": "c:/Users/user/Desktop/PSTU-CSE-2019/Numeric Method",
+      "program": "c:/Users/user/Desktop/PSTU-CSE-2019/Numeric Method/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
