@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RDT Stop-and-Wait Visualization</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--good:#10b981;--bad:#ef4444;--muted:#94a3b8}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#e6eef8;background:linear-gradient(180deg,#071024 0%,#061426 100%)}
+    .app{max-width:1100px;margin:18px auto;padding:18px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:12px}
+    h1{font-size:20px;margin:0}
+    .top-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .card{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .layout{display:flex;gap:16px}
+    .viz{flex:1;min-height:420px;padding:16px;position:relative;overflow:hidden}
+    .sidebar{width:360px}
+    .row{display:flex;gap:8px;align-items:center}
+    .node{width:160px;height:120px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-weight:600;border:1px solid rgba(255,255,255,0.03)}
+    .nodes{display:flex;justify-content:space-between;align-items:center;margin:18px 10px}
+    .link{height:6px;background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:6px;flex:1;margin:0 12px;position:relative}
+    .packet{position:absolute;padding:6px 10px;border-radius:999px;color:#00121a;font-weight:700;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 8px 16px rgba(6,182,212,0.12);transition:transform 800ms linear, opacity 200ms ease;white-space:pre-line;text-align:center;font-size:11px;line-height:1.2}
+    .packet.ack{background:var(--good);color:#05221c}
+    .packet.corrupt{background:var(--bad);opacity:0.85}
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    label{font-size:12px;color:var(--muted)}
+    input[type=range]{width:100%;accent-color:var(--accent)}
+    input[type=text]{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit;outline:none}
+    input[type=text]:focus{border-color:var(--accent)}
+    button{background:var(--accent);border:none;color:#001219;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer;transition:all 200ms ease}
+    button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(6,182,212,0.25)}
+    button:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    button.ghost:hover{background:rgba(255,255,255,0.05)}
+    .log{height:220px;overflow:auto;background:rgba(255,255,255,0.05);padding:8px;border-radius:8px;font-family:'Consolas','Monaco','Courier New',monospace;font-size:11px;color:#f1f5f9;white-space:pre-wrap}
+    .stats{display:flex;gap:8px;flex-wrap:wrap}
+    .stat{padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);min-width:120px;text-align:center;font-size:12px}
+    .stat div{font-size:16px;font-weight:bold;color:var(--accent)}
+    footer{margin-top:12px;color:var(--muted);font-size:13px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    @media (max-width: 768px) {
+      .layout{flex-direction:column}
+      .sidebar{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>RDT Stop-and-Wait — Interactive Visualization</h1>
+        <div style="font-size:13px;color:var(--muted)">Visual simulator of sender → channel → receiver (loss/corruption/delay)</div>
+      </div>
+      <div style="margin-left:auto" class="top-controls">
+        <button id="btnStart">Start</button>
+        <button id="btnStop" class="ghost">Stop</button>
+        <button id="btnAuto" class="ghost">Auto Send</button>
+        <a href="/mnt/data/Assignment for CCE 314.pdf" target="_blank" class="card" style="padding:8px 10px;text-decoration:none;color:var(--muted)">Open Assignment PDF</a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="viz card" id="viz">
+        <div class="nodes">
+          <div class="node" id="nodeSender">SENDER<div style="font-size:12px;color:var(--muted);margin-top:6px">port 12000</div></div>
+          <div class="link" id="link1"></div>
+          <div class="node" id="nodeChannel">CHANNEL<div style="font-size:12px;color:var(--muted);margin-top:6px">emulator</div></div>
+          <div class="link" id="link2"></div>
+          <div class="node" id="nodeReceiver">RECEIVER<div style="font-size:12px;color:var(--muted);margin-top:6px">port 13000</div></div>
+        </div>
+        <!-- packet container -->
+        <div id="packets"></div>
+      </div>
+
+      <div class="sidebar">
+        <div class="card" style="margin-bottom:10px">
+          <div class="row" style="justify-content:space-between;margin-bottom:8px"><strong>Channel Parameters</strong><span style="color:var(--muted);font-size:12px">tweak and observe</span></div>
+          <div style="margin-bottom:8px"><label for="drop">Drop Probability: <span id="dropVal">0.10</span></label><input id="drop" type="range" min="0" max="0.9" step="0.01" value="0.10"></div>
+          <div style="margin-bottom:8px"><label for="corrupt">Corrupt Probability: <span id="corruptVal">0.10</span></label><input id="corrupt" type="range" min="0" max="0.9" step="0.01" value="0.10"></div>
+          <div style="margin-bottom:6px"><label for="delay">Delay Probability: <span id="delayVal">0.10</span></label><input id="delay" type="range" min="0" max="0.9" step="0.01" value="0.10"></div>
+          <div style="margin-bottom:6px"><label for="maxDelay">Max Delay (s): <span id="maxDelayVal">1.00</span></label><input id="maxDelay" type="range" min="0" max="3" step="0.1" value="1.0"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div style="font-weight:700;margin-bottom:8px">Sender Controls</div>
+          <div class="row" style="margin-bottom:8px"><input id="messageInput" type="text" placeholder="Message text" style="flex:1"><button id="sendBtn">Send</button></div>
+          <div style="font-size:12px;color:var(--muted)">Seq shows sequence number (0/1). ACKs return from receiver.</div>
+        </div>
+
+        <div class="card" style="margin-bottom:10px">
+          <div style="font-weight:700;margin-bottom:8px">Statistics</div>
+          <div class="stats">
+            <div class="stat">Sent <div id="statSent">0</div></div>
+            <div class="stat">Retransmit <div id="statRetrans">0</div></div>
+            <div class="stat">Delivered <div id="statDelivered">0</div></div>
+            <div class="stat">Dropped <div id="statDropped">0</div></div>
+            <div class="stat">Corrupted <div id="statCorrupt">0</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700;margin-bottom:8px">Event Log</div>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Tip: adjust drop/corrupt/delay sliders and click <strong>Send</strong>. Use <strong>Auto Send</strong> to stream demo messages.</footer>
+  </div>
+
+  <script>
+    // Basic RDT Stop-and-Wait simulation (visual-only)
+    const packetsEl = document.getElementById('packets');
+    const logEl = document.getElementById('log');
+    const drop = document.getElementById('drop');
+    const corrupt = document.getElementById('corrupt');
+    const delay = document.getElementById('delay');
+    const maxDelay = document.getElementById('maxDelay');
+    const dropVal = document.getElementById('dropVal');
+    const corruptVal = document.getElementById('corruptVal');
+    const delayVal = document.getElementById('delayVal');
+    const maxDelayVal = document.getElementById('maxDelayVal');
+
+    const stat = {
+      sent: 0,
+      retrans: 0,
+      delivered: 0,
+      dropped: 0,
+      corrupt: 0
+    };
+
+    const updateStats = () => {
+      document.getElementById('statSent').innerText = stat.sent;
+      document.getElementById('statRetrans').innerText = stat.retrans;
+      document.getElementById('statDelivered').innerText = stat.delivered;
+      document.getElementById('statDropped').innerText = stat.dropped;
+      document.getElementById('statCorrupt').innerText = stat.corrupt;
+    };
+
+    const appendLog = (s) => { 
+      logEl.innerText = new Date().toLocaleTimeString() + ' — ' + s + '\n' + logEl.innerText; 
+    };
+
+    // Node positions
+    const nodeSender = document.getElementById('nodeSender');
+    const nodeChannel = document.getElementById('nodeChannel');
+    const nodeReceiver = document.getElementById('nodeReceiver');
+
+    function getCenter(el) {
+      const r = el.getBoundingClientRect();
+      const parentR = document.getElementById('viz').getBoundingClientRect();
+      return { x: r.left - parentR.left + r.width / 2, y: r.top - parentR.top + r.height / 2 };
+    }
+
+    // Packet engine
+    let seq = 0; // current seq at sender
+    let awaitingAck = false; // stop-and-wait
+    let lastPacket = null;
+    let timer = null;
+    let timeout = 2500; // ms
+    let autoMode = false;
+    const autoMessages = ["Hello", "Packet 2", "RDT 3.0", "Final"];
+    let autoIndex = 0;
+
+    function createPacketElement(text, opts) {
+      opts = opts || { ack: false, seq: 0 };
+      const el = document.createElement('div');
+      el.className = 'packet' + (opts.ack ? ' ack' : '');
+      el.innerText = (opts.ack ? 'ACK' : 'P') + opts.seq + '\n' + (opts.ack ? '' : text);
+      el.style.left = getCenter(nodeSender).x + 'px';
+      el.style.top = (getCenter(nodeSender).y + 40) + 'px';
+      packetsEl.appendChild(el);
+      return el;
+    }
+
+    function startTimer() {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        appendLog('TIMEOUT — retransmit seq ' + lastPacket.seq);
+        stat.retrans++;
+        updateStats();
+        // retransmit visual
+        sendPacketVisual(lastPacket.payload, lastPacket.seq, true);
+      }, timeout);
+    }
+
+    function stopTimer() { 
+      if (timer) { 
+        clearTimeout(timer); 
+        timer = null; 
+      } 
+    }
+
+    function sendPacket(payload, s) {
+      if (awaitingAck) { 
+        appendLog('Sender busy, ignoring send'); 
+        return; 
+      }
+      awaitingAck = true;
+      lastPacket = { payload, seq: s };
+      stat.sent++;
+      updateStats();
+      appendLog('SENDER: send seq ' + s + ' payload: "' + payload + '"');
+      sendPacketVisual(payload, s, false);
+      startTimer();
+    }
+
+    function sendPacketVisual(payload, s, isRetrans) {
+      const el = createPacketElement(payload, { ack: false, seq: s });
+      const start = getCenter(nodeSender);
+      const mid = getCenter(nodeChannel);
+      const end = getCenter(nodeReceiver);
+      // animate to channel
+      const dx = mid.x - start.x; 
+      const dy = mid.y - start.y;
+      requestAnimationFrame(() => el.style.transform = `translate(${dx}px, ${dy}px)`);
+
+      // after reach channel
+      setTimeout(() => {
+        // Channel decision
+        const doDrop = Math.random() < Number.parseFloat(drop.value);
+        const doCorrupt = Math.random() < Number.parseFloat(corrupt.value);
+        const doDelay = Math.random() < Number.parseFloat(delay.value);
+        
+        if (doDrop && !isRetrans) {
+          appendLog('CHANNEL: DROPPED packet seq ' + s);
+          stat.dropped++;
+          updateStats();
+          el.style.opacity = '0.12';
+          setTimeout(() => el.remove(), 500);
+          // Don't set awaitingAck = false here - let timeout handle retransmission
+          return;
+        }
+        
+        if (doCorrupt) {
+          appendLog('CHANNEL: CORRUPTED packet seq ' + s);
+          stat.corrupt++;
+          updateStats();
+          el.classList.add('corrupt');
+        }
+        
+        const d = doDelay ? Math.random() * Number.parseFloat(maxDelay.value) * 1000 : 0;
+        if (d > 0) appendLog('CHANNEL: delaying ' + (d / 1000).toFixed(2) + 's');
+        
+        // forward to receiver after delay
+        setTimeout(() => {
+          const dx2 = end.x - mid.x; 
+          const dy2 = end.y - mid.y;
+          el.style.transform = `translate(${dx + dx2}px, ${dy + dy2}px)`;
+          
+          // reach receiver
+          setTimeout(() => {
+            // if corrupted, receiver ignores & sends duplicate ACK for last good (simulate ack of 1-seq)
+            if (el.classList.contains('corrupt')) {
+              appendLog('RECEIVER: detected CORRUPTION — ignoring data');
+              // send duplicate ACK for previous
+              sendAckVisual(1 - s);
+              // remove packet
+              el.remove();
+            } else {
+              appendLog('RECEIVER: received seq ' + s + ' — delivering payload');
+              stat.delivered++;
+              updateStats();
+              sendAckVisual(s);
+              el.remove();
+            }
+          }, 500);
+        }, d);
+      }, 850);
+    }
+
+    function sendAckVisual(s) {
+      // ACK flows from receiver -> channel -> sender
+      const ack = document.createElement('div');
+      ack.className = 'packet ack';
+      ack.innerText = 'ACK' + s;
+      const recv = getCenter(nodeReceiver); 
+      ack.style.left = recv.x + 'px'; 
+      ack.style.top = (recv.y + 40) + 'px'; 
+      packetsEl.appendChild(ack);
+      
+      // move to channel
+      const mid = getCenter(nodeChannel); 
+      const dx = mid.x - recv.x; 
+      const dy = mid.y - recv.y;
+      requestAnimationFrame(() => ack.style.transform = `translate(${dx}px, ${dy}px)`);
+      
+      setTimeout(() => {
+        // channel decisions for ack
+        const doDrop = Math.random() < Number.parseFloat(drop.value);
+        const doCorrupt = Math.random() < Number.parseFloat(corrupt.value);
+        const doDelay = Math.random() < Number.parseFloat(delay.value);
+        
+        if (doDrop) { 
+          appendLog('CHANNEL: DROPPED ACK ' + s); 
+          stat.dropped++; 
+          updateStats(); 
+          ack.remove(); 
+          return; 
+        }
+        
+        if (doCorrupt) { 
+          appendLog('CHANNEL: CORRUPTED ACK ' + s); 
+          ack.classList.add('corrupt'); 
+          stat.corrupt++; 
+          updateStats(); 
+        }
+        
+        const d = doDelay ? Math.random() * Number.parseFloat(maxDelay.value) * 1000 : 0;
+        
+        setTimeout(() => {
+          const start = getCenter(nodeSender); 
+          const dx2 = start.x - mid.x; 
+          const dy2 = start.y - mid.y;
+          ack.style.transform = `translate(${dx + dx2}px, ${dy + dy2}px)`;
+          
+          setTimeout(() => {
+            // arrival at sender
+            if (ack.classList.contains('corrupt')) {
+              appendLog('SENDER: received CORRUPTED ACK — ignoring');
+              // do nothing, wait for timeout
+              ack.remove();
+              return;
+            }
+            
+            appendLog('SENDER: received ACK ' + s);
+            // stop timer if ack matches
+            if (s === seq) {
+              stopTimer(); 
+              awaitingAck = false; 
+              seq = 1 - seq; // flip seq
+            } else {
+              // duplicate ack for previously received pkt (e.g., when receiver sends ack for last good)
+              appendLog('SENDER: ACK ' + s + ' is duplicate (not expected)');
+            }
+            ack.remove();
+          }, 420);
+        }, d);
+      }, 520);
+    }
+
+    // UI bindings
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const m = document.getElementById('messageInput').value || 'Hello';
+      sendPacket(m, seq);
+    });
+    
+    document.getElementById('btnStart').addEventListener('click', () => { 
+      appendLog('Simulation started'); 
+      autoMode = false; 
+    });
+    
+    document.getElementById('btnStop').addEventListener('click', () => { 
+      appendLog('Simulation stopped'); 
+      autoMode = false; 
+    });
+    
+    document.getElementById('btnAuto').addEventListener('click', () => {
+      autoMode = !autoMode; 
+      document.getElementById('btnAuto').innerText = autoMode ? 'Stop Auto' : 'Auto Send';
+      if (autoMode) {
+        autoSendLoop();
+      }
+    });
+
+    function autoSendLoop() { 
+      if (!autoMode) return; 
+      sendPacket(autoMessages[autoIndex % autoMessages.length], seq); 
+      autoIndex++; 
+      setTimeout(autoSendLoop, 1800); 
+    }
+
+    // sliders update
+    function updateVals() { 
+      dropVal.innerText = Number.parseFloat(drop.value).toFixed(2); 
+      corruptVal.innerText = Number.parseFloat(corrupt.value).toFixed(2); 
+      delayVal.innerText = Number.parseFloat(delay.value).toFixed(2); 
+      maxDelayVal.innerText = Number.parseFloat(maxDelay.value).toFixed(2); 
+    }
+    
+    for (const el of [drop, corrupt, delay, maxDelay]) {
+      el.addEventListener('input', updateVals);
+    }
+    updateVals();
+
+    // Initialize simulation
+    appendLog('RDT Visualizer ready — tweak parameters and press Send');
+    updateStats();
+  </script>
+</body>
+</html>
